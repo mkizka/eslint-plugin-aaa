@@ -24,6 +24,31 @@ const getTestBody = (node: ESTree.Node) => {
   return null;
 };
 
+const validateComments = (comments: ESTree.Comment[]) => {
+  const validComments: ESTree.Comment[] = [];
+  for (const comment of comments) {
+    if (
+      comment.value.toLowerCase().trim().startsWith("arrange") &&
+      validComments.length === 0
+    ) {
+      validComments.push(comment);
+    }
+    if (
+      comment.value.toLowerCase().trim().startsWith("act") &&
+      validComments.length === 1
+    ) {
+      validComments.push(comment);
+    }
+    if (
+      comment.value.toLowerCase().trim().startsWith("assert") &&
+      validComments.length === 2
+    ) {
+      validComments.push(comment);
+    }
+  }
+  return validComments;
+};
+
 export const arrangeActAssertRule: Rule.RuleModule = {
   meta: {
     type: "problem",
@@ -31,6 +56,7 @@ export const arrangeActAssertRule: Rule.RuleModule = {
       description: "Enforce comments in the order of arrange, act, and assert",
     },
     schema: [],
+    fixable: "code", // This rule can be fixed automatically
   },
   create(context) {
     return {
@@ -40,59 +66,26 @@ export const arrangeActAssertRule: Rule.RuleModule = {
 
         const comments = testBody
           .map((node) => context.sourceCode.getCommentsBefore(node))
-          .flat()
-          .map((comment) => {
-            const text = comment.value.trim();
-            return {
-              text,
-              loc: comment.loc,
-              valid: false,
-            };
-          });
+          .flat();
+        const validComments = validateComments(comments);
 
-        const found = {
-          arrange: false,
-          act: false,
-          assert: false,
-        };
-        for (const comment of comments) {
-          if (comment.text === "arrange") {
-            comment.valid = !found.arrange && !found.act && !found.assert;
-            found.arrange = true;
-          } else if (comment.text === "act") {
-            comment.valid = found.arrange && !found.act && !found.assert;
-            found.act = true;
-          } else if (comment.text === "assert") {
-            comment.valid = found.arrange && found.act && !found.assert;
-            found.assert = true;
-          }
-        }
-
-        const lastValidCommentLoc = comments.findLast(
-          (comment) => comment.valid,
-        )?.loc;
-        const reportOptions = lastValidCommentLoc
-          ? { loc: lastValidCommentLoc }
-          : { node };
-
-        if (!found.arrange) {
+        if (validComments.length === 0) {
           context.report({
-            ...reportOptions,
-            message:
-              "`arrange` comment needs to appear at the beginning of the test.",
+            node,
+            message: "`arrange`, `act`, and `assert` comments are missing.",
           });
           return;
         }
-        if (!found.act) {
+        if (validComments.length === 1) {
           context.report({
-            ...reportOptions,
+            loc: validComments.at(-1)!.loc!,
             message: "`act` comment needs to appear after `arrange`.",
           });
           return;
         }
-        if (!found.assert) {
+        if (validComments.length === 2) {
           context.report({
-            ...reportOptions,
+            loc: validComments.at(-1)!.loc!,
             message: "`assert` comment needs to appear after `act`.",
           });
           return;
