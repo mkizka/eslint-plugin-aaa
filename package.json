@@ -1,0 +1,59 @@
+{
+  "name": "@mkizka/eslint-plugin-aaa",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "ESLint plugin for enforcing Arrange-Act-Assert pattern",
+  "license": "MIT",
+  "packageManager": "pnpm@9.7.1+sha512.faf344af2d6ca65c4c5c8c2224ea77a81a5e8859cbc4e06b1511ddce2f0151512431dd19e6aff31f2c6a8f5f2aced9bd2273e1fed7dd4de1868984059d2c4247",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "eslint",
+    "test"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "format": "eslint --fix . && prettier --write .",
+    "playground": "pnpm build && eslint --config ./playground/eslint.config.js ./playground",
+    "prepare": "husky",
+    "release": "np",
+    "test": "vitest",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@mkizka/eslint-config": "^5.3.1",
+    "@tsconfig/node20": "^20.1.4",
+    "@types/eslint": "^9.6.0",
+    "@types/estree": "^1.0.5",
+    "eslint": "^9.9.0",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.9",
+    "np": "^10.0.7",
+    "prettier": "^3.3.3",
+    "prettier-plugin-pkg": "^0.18.1",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  },
+  "lint-staged": {
+    "*": [
+      "prettier --ignore-unknown --write",
+      "eslint --fix"
+    ]
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-pkg"
+    ]
+  }
+}
