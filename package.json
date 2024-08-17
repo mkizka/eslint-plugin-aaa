@@ -1,6 +1,6 @@
 {
   "name": "@mkizka/eslint-plugin-aaa",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "description": "ESLint plugin for enforcing Arrange-Act-Assert pattern",
   "license": "MIT",
