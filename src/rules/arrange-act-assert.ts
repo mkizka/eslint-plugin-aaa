@@ -19,7 +19,7 @@ const getTestBody = (node: ESTree.Node) => {
     isFunction(node.arguments[1]) &&
     node.arguments[1].body.type === "BlockStatement"
   ) {
-    return node.arguments[1].body.body;
+    return node.arguments[1].body;
   }
   return null;
 };
@@ -64,11 +64,9 @@ export const arrangeActAssertRule: Rule.RuleModule = {
         const testBody = getTestBody(node);
         if (!testBody) return;
 
-        const comments = testBody
-          .map((node) => context.sourceCode.getCommentsBefore(node))
-          .flat();
-        const validComments = validateComments(comments);
-
+        const validComments = validateComments(
+          context.sourceCode.getCommentsInside(testBody),
+        );
         if (validComments.length === 0) {
           context.report({
             node,

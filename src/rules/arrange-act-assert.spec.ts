@@ -57,6 +57,17 @@ describe("arrangeActAssert", () => {
       `,
     });
   });
+  test("OK if comments only exist", () => {
+    runTest({
+      code: `\
+        test("my test", () => {
+          // arrange
+          // act
+          // assert
+        });
+      `,
+    });
+  });
   test("Do not report if argument is not a function", () => {
     runTest({ code: "test(null)" });
   });
